@@ -4,7 +4,7 @@ package_name = 'image_processor'
 
 setup(
     name=package_name,
-    version='0.0.0',
+    version='0.0.1',
     packages=[package_name],
     data_files=[
         ('share/ament_index/resource_index/packages',
@@ -13,13 +13,14 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='yvxaiver',
-    maintainer_email='you@example.com',
+    maintainer='ggao22',
+    maintainer_email='g.gao@wustl.edu',
     description='TODO: Package description',
     license='TODO: License declaration',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'image_processor = image_processor.image_processor_node:main',
         ],
     },
 )
