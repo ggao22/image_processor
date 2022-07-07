@@ -12,7 +12,7 @@ import cv2
 import numpy as np
 import tensorflow as tf
 
-sys.path.append('/home/yvxaiver/lanenet-lane-detection')
+sys.path.append('$HOME/lanenet-lane-detection')
 from lanenet_model import lanenet
 from lanenet_model import lanenet_postprocess
 from local_utils.config_utils import parse_config_utils
@@ -21,14 +21,16 @@ from local_utils.log_util import init_logger
 CFG = parse_config_utils.lanenet_cfg
 LOG = init_logger.get_logger(log_file_name_prefix='lanenet_test')
 
+sys.path.append('$HOME/LaneNet_to_Trajectory')
 from LaneNetToTrajectory import LaneProcessing, DualLanesToTrajectory
 
 
 class LaneNetImageProcessor():
 
-    def __init__(self, weights_path, with_lane_fit=False):
+    def __init__(self, weights_path, image_width, image_height):
         self.weights_path = weights_path
-        self.with_lane_fit = with_lane_fit
+        self.image_width = image_width
+        self.image_height = image_height
 
 
     def init_lanenet(self):
@@ -59,6 +61,8 @@ class LaneNetImageProcessor():
 
         with self.sess.as_default():
             self.saver.restore(sess=self.sess, save_path=self.weights_path)
+        
+        return True
 
 
     def image_to_trajectory(self, image):
@@ -85,15 +89,15 @@ class LaneNetImageProcessor():
         )
 
         # TODO: Image size up to change
-        full_lane_pts = LaneProcessing(full_lane_pts,x_size=1280,y_size=720).get_full_lane_pts()
+        full_lane_pts = LaneProcessing(full_lane_pts,image_width=self.image_width,image_height=self.image_height).get_full_lane_pts()
 
-        splines = []
+        centerpts = []
         for i in range(len(full_lane_pts)):
             if not i: continue
             traj = DualLanesToTrajectory(full_lane_pts[i-1],full_lane_pts[i])
-            splines.append(traj.get_spline())
+            centerpts.append(traj.centerpoints())
         
-        return splines
+        return centerpts
 
         
         
