@@ -92,10 +92,11 @@ class LaneNetImageProcessor():
         full_lane_pts = LaneProcessing(full_lane_pts,image_width=self.image_width,image_height=self.image_height).get_full_lane_pts()
 
         centerpts = []
-        for i in range(len(full_lane_pts)):
-            if not i: continue
-            traj = DualLanesToTrajectory(full_lane_pts[i-1],full_lane_pts[i])
-            centerpts.append(traj.centerpoints())
+        if full_lane_pts:
+            for i in range(len(full_lane_pts)):
+                if not i: continue
+                traj = DualLanesToTrajectory(full_lane_pts[i-1],full_lane_pts[i])
+                centerpts.append(traj.centerpoints())
         
         return centerpts
 
