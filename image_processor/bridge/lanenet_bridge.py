@@ -6,6 +6,7 @@ ros2 Image to LaneNet Bridge
 import os.path as ops
 import sys
 import time
+import math
 
 import sklearn 
 import cv2
@@ -88,18 +89,27 @@ class LaneNetImageProcessor():
             data_source='tusimple'
         )
 
-        # TODO: Image size up to change
         full_lane_pts = LaneProcessing(full_lane_pts,image_width=self.image_width,image_height=self.image_height).get_full_lane_pts()
 
         centerpts = []
+        splines = []
+        closest_lane_dist = float('inf')
+        closest_lane_idx = 0
+
+        # TODO: debug
         print(full_lane_pts)
+
         if full_lane_pts:
             for i in range(len(full_lane_pts)):
                 if not i: continue
                 traj = DualLanesToTrajectory(full_lane_pts[i-1],full_lane_pts[i])
-                centerpts.append(traj.centerpoints())
+                centerpts.append(traj.get_centerpoints())
+                splines.append(traj.get_spline())
+            for i in range(len(splines)):
+                if math.abs(splines[i](0)-self.image_width/2) < closest_lane_dist:
+                    closest_lane_idx = i
         
-        return centerpts
+        return centerpts[closest_lane_idx]
 
         
         
