@@ -109,8 +109,8 @@ class LaneNetImageProcessor():
                 if math.abs(splines[i](0)-self.image_width/2) < closest_lane_dist:
                     closest_lane_idx = i
         
-            return centerpts[closest_lane_idx]
-            
+        if centerpts: return centerpts[closest_lane_idx]
+
         return None
 
         
