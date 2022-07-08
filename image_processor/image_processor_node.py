@@ -27,7 +27,7 @@ class ImageProcessorNode(Node):
         try:
             cv_frame = self.bridge.imgmsg_to_cv2(data, "bgr8") # TODO: adding image processing
             if self.lanenet_status:
-                self.centerpts = self.processor.image_to_trajectory(self, cv_frame)
+                self.centerpts = self.processor.image_to_trajectory(cv_frame)
                 
             # debug
             print(self.centerpts)
