@@ -34,8 +34,8 @@ class ImageProcessorNode(Node):
             print("\n")
             if self.centerpts:
                 for i in range(len(self.centerpts[0])):
-                    cv2.circles(cv_frame,(self.centerpts[0][i],
-                                            self.centerpts[1][i]), 5, (255, 0, 0), -1)
+                    cv2.circle(cv_frame,(int(self.centerpts[0][i]),
+                                            int(self.centerpts[1][i])), 5, (0, 0, 255), -1)
             cv2.imshow("camera", cv_frame)
             cv2.waitKey(1)
         except CvBridgeError as e:
