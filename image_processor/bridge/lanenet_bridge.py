@@ -67,19 +67,14 @@ class LaneNetImageProcessor():
 
     def image_to_trajectory(self, image):
 
-        t_start = time.time()
         image_vis = image
         image = cv2.resize(image, (512, 256), interpolation=cv2.INTER_LINEAR)
         image = image / 127.5 - 1.0
-        LOG.info('Image load cost time: {:.5f}s'.format(time.time() - t_start))
 
-        t_start = time.time()
         binary_seg_image, instance_seg_image = self.sess.run(
             [self.binary_seg_ret, self.instance_seg_ret],
             feed_dict={self.input_tensor: [image]}
         )
-        t_cost = time.time() - t_start
-        LOG.info('Image inference cost time: {:.5f}s'.format(t_cost))
 
         full_lane_pts = self.postprocessor.postprocess_lanepts(
             binary_seg_result=binary_seg_image[0],
@@ -88,7 +83,6 @@ class LaneNetImageProcessor():
             data_source='tusimple'
         )
 
-        print(full_lane_pts)
         full_lane_pts = LaneProcessing(full_lane_pts,image_width=self.image_width,image_height=self.image_height).get_full_lane_pts()
 
         centerpts = []
@@ -100,7 +94,7 @@ class LaneNetImageProcessor():
         if full_lane_pts:
             for i in range(len(full_lane_pts)):
                 if not i: continue
-                traj = DualLanesToTrajectory(full_lane_pts[i-1],full_lane_pts[i])
+                traj = DualLanesToTrajectory(full_lane_pts[i-1],full_lane_pts[i],N_centerpts=20)
                 centerpts.append(traj.get_centerpoints())
                 splines.append(traj.get_spline())
         #     for i in range(len(splines)):

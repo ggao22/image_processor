@@ -13,7 +13,7 @@ class ImageProcessorNode(Node):
 
     def __init__(self):
         super().__init__('image_processor')
-        self.subscriber_ = self.create_subscription(Image, '/raw_frame', self.image_callback, 10)
+        self.subscriber_ = self.create_subscription(Image, '/raw_frame', self.image_callback, 1)
         self.subscriber_
         self.bridge = CvBridge()
         self.weights_path = "/home/yvxaiver/lanenet-lane-detection/weights/tusimple_lanenet.ckpt"
@@ -29,26 +29,24 @@ class ImageProcessorNode(Node):
             cv_frame = self.bridge.imgmsg_to_cv2(data, "bgr8")
             if self.lanenet_status:
                 self.full_lanepts, self.centerpts = self.processor.image_to_trajectory(cv_frame)
-                
-            # debug
-            print(self.full_lanepts)
             print(self.centerpts)
-            print("\n")
-
+            pass
             if self.full_lanepts:
                 for lane in self.full_lanepts:
                     for pt in lane:
-                        cv2.circle(cv_frame,tuple(pt), 5, (0, 255, 0), -1)
+                        cv2.circle(cv_frame,tuple(([0,self.image_height] - pt)*[-1,1]), 5, (0, 255, 0), -1)
 
             if self.centerpts:
-                for j in range(len(self.centerpts)):
-                    for i in range(len(self.centerpts[j])):
-                        cv2.circle(cv_frame,(int(self.centerpts[j][0][i]),
-                                                int(self.centerpts[j][1][i])), 5, (0, 0, 255), -1)
+                for lane in self.centerpts:
+                    for i in range(len(lane[0])):
+                        cv2.circle(cv_frame,(int(lane[0][i]),
+                                                self.image_height-int(lane[1][i])), 5, (0, 0, 255), -1)
             cv2.imshow("camera", cv_frame)
             cv2.waitKey(1)
         except CvBridgeError as e:
             print(e) # TODO: Error handing
+        except Exception as e:
+            print(e)
 
 def main(args=None):
     rclpy.init(args=args)
