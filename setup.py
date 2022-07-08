@@ -1,12 +1,12 @@
 from setuptools import setup
 
 package_name = 'image_processor'
-submodules = 'image_processor/bridge'
+bridge = 'image_processor/bridge'
 
 setup(
     name=package_name,
     version='0.0.1',
-    packages=[package_name],
+    packages=[package_name, bridge],
     data_files=[
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
