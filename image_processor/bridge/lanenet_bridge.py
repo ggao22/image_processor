@@ -92,11 +92,9 @@ class LaneNetImageProcessor():
 
         centerpts = []
         splines = []
-        closest_lane_dist = float('inf')
-        closest_lane_idx = 0
 
-        # TODO: debug
-        print(full_lane_pts)
+        # closest_lane_dist = float('inf')
+        # closest_lane_idx = 0
 
         if full_lane_pts:
             for i in range(len(full_lane_pts)):
@@ -104,11 +102,13 @@ class LaneNetImageProcessor():
                 traj = DualLanesToTrajectory(full_lane_pts[i-1],full_lane_pts[i])
                 centerpts.append(traj.get_centerpoints())
                 splines.append(traj.get_spline())
-            for i in range(len(splines)):
-                if abs(splines[i](0)-self.image_width/2) < closest_lane_dist:
-                    closest_lane_idx = i
+        #     for i in range(len(splines)):
+        #         if abs(splines[i](0)-self.image_width/2) < closest_lane_dist:
+        #             closest_lane_idx = i
         
-        if centerpts: return centerpts[closest_lane_idx]
+        # if centerpts: return full_lane_pts, centerpts[closest_lane_idx]
+
+        if centerpts: return full_lane_pts, centerpts
 
         return None
 
