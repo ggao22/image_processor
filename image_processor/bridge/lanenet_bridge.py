@@ -88,6 +88,7 @@ class LaneNetImageProcessor():
             data_source='tusimple'
         )
 
+        print(full_lane_pts)
         full_lane_pts = LaneProcessing(full_lane_pts,image_width=self.image_width,image_height=self.image_height).get_full_lane_pts()
 
         centerpts = []
@@ -110,7 +111,7 @@ class LaneNetImageProcessor():
 
         if centerpts: return full_lane_pts, centerpts
 
-        return None
+        return None, None
 
         
         

@@ -36,14 +36,15 @@ class ImageProcessorNode(Node):
             print("\n")
 
             if self.full_lanepts:
-                for pt in self.full_lanepts:
-                    cv2.circle(cv_frame,tuple(pt), 5, (0, 255, 0), -1)
+                for lane in self.full_lanepts:
+                    for pt in lane:
+                        cv2.circle(cv_frame,tuple(pt), 5, (0, 255, 0), -1)
 
             if self.centerpts:
-                for i in range(len(self.centerpts)):
-                    for i in range(len(self.centerpts[i])):
-                        cv2.circle(cv_frame,(int(self.centerpts[0][i]),
-                                                int(self.centerpts[1][i])), 5, (0, 0, 255), -1)
+                for j in range(len(self.centerpts)):
+                    for i in range(len(self.centerpts[j])):
+                        cv2.circle(cv_frame,(int(self.centerpts[j][0][i]),
+                                                int(self.centerpts[j][1][i])), 5, (0, 0, 255), -1)
             cv2.imshow("camera", cv_frame)
             cv2.waitKey(1)
         except CvBridgeError as e:
