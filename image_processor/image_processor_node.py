@@ -5,9 +5,7 @@ from sensor_msgs.msg import Image
 import cv2
 from cv_bridge import CvBridge, CvBridgeError
 
-import sys
-sys.path.append('$HOME/camera_ws/src/image_processor/image_processor/')
-from lanenet_bridge import LaneNetImageProcessor
+from .bridge.lanenet_bridge import LaneNetImageProcessor
 
 
 class ImageProcessorNode(Node):

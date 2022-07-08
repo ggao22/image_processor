@@ -1,6 +1,7 @@
 from setuptools import setup
 
 package_name = 'image_processor'
+submodules = 'image_processor/bridge'
 
 setup(
     name=package_name,
