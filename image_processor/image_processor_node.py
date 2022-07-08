@@ -17,23 +17,23 @@ class ImageProcessorNode(Node):
         self.subscriber_
         self.bridge = CvBridge()
         self.weights_path = "/home/yvxaiver/lanenet-lane-detection/weights/tusimple_lanenet.ckpt"
-        self.image_width = 640
-        self.image_height = 480 
+        self.image_width = 720
+        self.image_height = 1280
         self.processor = LaneNetImageProcessor(self.weights_path,self.image_width,self.image_height)
         self.lanenet_status = self.processor.init_lanenet()
         self.centerpts = []
 
     def image_callback(self,data):
         try:
-            cv_frame = self.bridge.imgmsg_to_cv2(data, "bgr8") # TODO: adding image processing
+            cv_frame = self.bridge.imgmsg_to_cv2(data, "bgr8")
             if self.lanenet_status:
                 self.centerpts = self.processor.image_to_trajectory(cv_frame)
                 
             # debug
             print(self.centerpts)
             print("\n")
-            # cv2.imshow("camera", cv_frame)
-            # cv2.waitKey(1)
+            cv2.imshow("camera", cv_frame)
+            cv2.waitKey(1)
         except CvBridgeError as e:
             print(e) # TODO: Error handing
 

@@ -92,6 +92,7 @@ class LaneNetImageProcessor():
         full_lane_pts = LaneProcessing(full_lane_pts,image_width=self.image_width,image_height=self.image_height).get_full_lane_pts()
 
         centerpts = []
+        print(full_lane_pts)
         if full_lane_pts:
             for i in range(len(full_lane_pts)):
                 if not i: continue
