@@ -12,7 +12,7 @@ import cv2
 import numpy as np
 import tensorflow as tf
 
-sys.path.append('$HOME/lanenet-lane-detection')
+sys.path.append('/home/yvxaiver/lanenet-lane-detection')
 from lanenet_model import lanenet
 from lanenet_model import lanenet_postprocess
 from local_utils.config_utils import parse_config_utils
@@ -21,7 +21,7 @@ from local_utils.log_util import init_logger
 CFG = parse_config_utils.lanenet_cfg
 LOG = init_logger.get_logger(log_file_name_prefix='lanenet_test')
 
-sys.path.append('$HOME/LaneNet_to_Trajectory')
+sys.path.append('/home/yvxaiver/LaneNet_to_Trajectory')
 from LaneNetToTrajectory import LaneProcessing, DualLanesToTrajectory
 
 
