@@ -16,7 +16,7 @@ class ImageProcessorNode(Node):
         self.subscriber_ = self.create_subscription(Image, '/raw_frame', self.image_callback, 10)
         self.subscriber_
         self.bridge = CvBridge()
-        self.weights_path = "$HOME/lanenet-lane-detection/weights/tusimple_lanenet.ckpt"
+        self.weights_path = "/home/yvxaiver/lanenet-lane-detection/weights/tusimple_lanenet.ckpt"
         self.image_width = 640
         self.image_height = 480 
         self.processor = LaneNetImageProcessor(self.weights_path,self.image_width,self.image_height)
