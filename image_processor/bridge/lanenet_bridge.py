@@ -6,7 +6,6 @@ ros2 Image to LaneNet Bridge
 import os.path as ops
 import sys
 import time
-import math
 
 import sklearn 
 import cv2
@@ -106,7 +105,7 @@ class LaneNetImageProcessor():
                 centerpts.append(traj.get_centerpoints())
                 splines.append(traj.get_spline())
             for i in range(len(splines)):
-                if math.abs(splines[i](0)-self.image_width/2) < closest_lane_dist:
+                if abs(splines[i](0)-self.image_width/2) < closest_lane_dist:
                     closest_lane_idx = i
         
         if centerpts: return centerpts[closest_lane_idx]
