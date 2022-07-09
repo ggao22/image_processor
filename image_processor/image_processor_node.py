@@ -18,8 +18,8 @@ class ImageProcessorNode(Node):
         self.subscriber_
         self.bridge = CvBridge()
         self.weights_path = "/home/yvxaiver/lanenet-lane-detection/weights/tusimple_lanenet.ckpt"
-        self.image_width = 720
-        self.image_height = 1280
+        self.image_width = 1280
+        self.image_height = 720
         self.processor = LaneNetImageProcessor(self.weights_path,self.image_width,self.image_height)
         self.lanenet_status = self.processor.init_lanenet()
         self.centerpts = []
@@ -44,15 +44,21 @@ class ImageProcessorNode(Node):
                     for pt in lane:
                         cv2.circle(cv_frame,tuple(([0,self.image_height] - pt)*[-1,1]), 5, (0, 255, 0), -1)
         if self.centerpts:
+            print(self.centerpts)
             for lane in self.centerpts:
                 for i in range(len(lane[0])):
                     cv2.circle(cv_frame,(int(lane[0][i]),
                                             self.image_height-int(lane[1][i])), 5, (0, 0, 255), -1)
         cv2.imshow("camera", cv_frame)
         cv2.waitKey(1)
-        plt.figure('camera')
-        plt.imshow(cv_frame)
-        plt.pause(0.5)
+
+        # if self.full_lanepts and self.centerpts:
+        #     for i in range(len(self.full_lanepts)):
+        #         lane_pts = self.full_lanepts[i]
+        #         plt.scatter(lane_pts[:,0],lane_pts[:,1])
+        #         if i == len(self.full_lanepts)-1: continue
+        #         plt.scatter(self.centerpts[i][0],self.centerpts[i][1])
+        #     plt.pause(0.1)
 
 
 def main(args=None):
