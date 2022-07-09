@@ -29,20 +29,19 @@ class ImageProcessorNode(Node):
             cv_frame = self.bridge.imgmsg_to_cv2(data, "bgr8")
             if self.lanenet_status:
                 self.full_lanepts, self.centerpts = self.processor.image_to_trajectory(cv_frame)
-            print(self.centerpts)
-            pass
-            if self.full_lanepts:
-                for lane in self.full_lanepts:
-                    for pt in lane:
-                        cv2.circle(cv_frame,tuple(([0,self.image_height] - pt)*[-1,1]), 5, (0, 255, 0), -1)
+            
+            # if self.full_lanepts:
+            #     for lane in self.full_lanepts:
+            #         for pt in lane:
+            #             cv2.circle(cv_frame,tuple(([0,self.image_height] - pt)*[-1,1]), 5, (0, 255, 0), -1)
 
-            if self.centerpts:
-                for lane in self.centerpts:
-                    for i in range(len(lane[0])):
-                        cv2.circle(cv_frame,(int(lane[0][i]),
-                                                self.image_height-int(lane[1][i])), 5, (0, 0, 255), -1)
-            cv2.imshow("camera", cv_frame)
-            cv2.waitKey(1)
+            # if self.centerpts:
+            #     for lane in self.centerpts:
+            #         for i in range(len(lane[0])):
+            #             cv2.circle(cv_frame,(int(lane[0][i]),
+            #                                     self.image_height-int(lane[1][i])), 5, (0, 0, 255), -1)
+            # cv2.imshow("camera", cv_frame)
+            # cv2.waitKey(1)
         except CvBridgeError as e:
             print(e) # TODO: Error handing
         except Exception as e:

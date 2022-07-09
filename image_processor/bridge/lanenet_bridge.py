@@ -67,6 +67,7 @@ class LaneNetImageProcessor():
 
     def image_to_trajectory(self, image):
 
+        lanenet_start = time.time()
         image_vis = image
         image = cv2.resize(image, (512, 256), interpolation=cv2.INTER_LINEAR)
         image = image / 127.5 - 1.0
@@ -82,9 +83,10 @@ class LaneNetImageProcessor():
             source_image=image_vis,
             data_source='tusimple'
         )
+        print('Lanenet cost time: {:.5f}s'.format(time.time() - lanenet_start))
 
+        lanep_start = time.time()
         full_lane_pts = LaneProcessing(full_lane_pts,image_width=self.image_width,image_height=self.image_height).get_full_lane_pts()
-
         centerpts = []
         splines = []
 
@@ -102,9 +104,10 @@ class LaneNetImageProcessor():
         #             closest_lane_idx = i
         
         # if centerpts: return full_lane_pts, centerpts[closest_lane_idx]
+        
+        print('Lane processing cost time: {:.5f}s'.format(time.time() - lanep_start))
 
         if centerpts: return full_lane_pts, centerpts
-
         return None, None
 
         
