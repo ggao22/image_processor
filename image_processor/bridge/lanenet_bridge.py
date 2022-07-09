@@ -11,6 +11,9 @@ import sklearn
 import cv2
 import numpy as np
 import tensorflow as tf
+import tensorflow.contrib.tensorrt as trt
+
+from tensorflow.python.compiler.tensorrt import trt_convert as trt
 
 sys.path.append('/home/yvxaiver/lanenet-lane-detection')
 from lanenet_model import lanenet
@@ -61,7 +64,7 @@ class LaneNetImageProcessor():
 
         with self.sess.as_default():
             self.saver.restore(sess=self.sess, save_path=self.weights_path)
-        
+
         return True
 
 
