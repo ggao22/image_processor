@@ -93,8 +93,8 @@ class LaneNetImageProcessor():
         centerpts = []
         splines = []
 
-        # closest_lane_dist = float('inf')
-        # closest_lane_idx = 0
+        closest_lane_dist = float('inf')
+        closest_lane_idx = 0
 
         if full_lane_pts:
             for i in range(len(full_lane_pts)):
@@ -102,15 +102,13 @@ class LaneNetImageProcessor():
                 traj = DualLanesToTrajectory(full_lane_pts[i-1],full_lane_pts[i],N_centerpts=20)
                 centerpts.append(traj.get_centerpoints())
                 splines.append(traj.get_spline())
-        #     for i in range(len(splines)):
-        #         if abs(splines[i](0)-self.image_width/2) < closest_lane_dist:
-        #             closest_lane_idx = i
-        
-        # if centerpts: return full_lane_pts, centerpts[closest_lane_idx]
+            for i in range(len(splines)):
+                if abs(splines[i](0)-self.image_width/2) < closest_lane_dist:
+                    closest_lane_idx = i
         
         print('Lane processing cost time: {:.5f}s'.format(time.time() - lanep_start))
-
-        if centerpts: return full_lane_pts, centerpts
+        if centerpts: return full_lane_pts, centerpts[closest_lane_idx]
+        # if centerpts: return full_lane_pts, centerpts
         return None, None
 
         
