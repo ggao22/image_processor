@@ -103,7 +103,9 @@ class LaneNetImageProcessor():
                 centerpts.append(traj.get_centerpoints())
                 splines.append(traj.get_spline())
             for i in range(len(splines)):
-                if abs(splines[i](0)-self.image_width/2) < closest_lane_dist:
+                new_dist = abs(splines[i](0)-self.image_width/2)
+                if new_dist < closest_lane_dist:
+                    closest_lane_dist = new_dist
                     closest_lane_idx = i
         
         print('Lane processing cost time: {:.5f}s'.format(time.time() - lanep_start))
