@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 import rclpy
 from rclpy.node import Node
+from rclpy.duration import Duration
+
 from sensor_msgs.msg import Image
+from ackermann_msgs.msg import AckermannDriveStamped
+
 import sklearn 
 import cv2
 import matplotlib.pyplot as plt
@@ -32,6 +36,7 @@ class ImageProcessorNode(Node):
                 self.full_lanepts, self.centerpts = self.processor.image_to_trajectory(cv_frame)
 
             self.image_display(cv_frame)
+            self.image_save(cv_frame)
 
         except CvBridgeError as e:
             print(e) # TODO: Error handing
@@ -50,14 +55,9 @@ class ImageProcessorNode(Node):
                                         self.image_height-int(self.centerpts[1][i])), 5, (0, 0, 255), -1)
         cv2.imshow("camera", cv_frame)
         cv2.waitKey(1)
-
-        # if self.full_lanepts and self.centerpts:
-        #     for i in range(len(self.full_lanepts)):
-        #         lane_pts = self.full_lanepts[i]
-        #         plt.scatter(lane_pts[:,0],lane_pts[:,1])
-        #         if i == len(self.full_lanepts)-1: continue
-        #         plt.scatter(self.centerpts[i][0],self.centerpts[i][1])
-        #     plt.pause(0.1)
+    
+    def image_save(self, cv_frame):
+        cv2.imwrite('/home/yvxaiver/camera_ws/src/image_processing/output',cv_frame)
 
 
 def main(args=None):

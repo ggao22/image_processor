@@ -2,11 +2,13 @@ from setuptools import setup
 
 package_name = 'image_processor'
 bridge = 'image_processor/bridge'
+stanley_controller = 'image_processor/stanley_controller'
+
 
 setup(
     name=package_name,
     version='0.0.1',
-    packages=[package_name, bridge],
+    packages=[package_name, bridge, stanley_controller],
     data_files=[
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
