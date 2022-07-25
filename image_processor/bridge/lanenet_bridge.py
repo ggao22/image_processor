@@ -11,9 +11,6 @@ import sklearn
 import cv2
 import numpy as np
 import tensorflow as tf
-import tensorflow.contrib.tensorrt as trt
-
-from tensorflow.python.compiler.tensorrt import trt_convert as trt
 
 sys.path.append('/home/yvxaiver/lanenet-lane-detection')
 from lanenet_model import lanenet
@@ -68,7 +65,7 @@ class LaneNetImageProcessor():
         return True
 
 
-    def image_to_trajectory(self, image):
+    def image_to_trajectory(self, image, lane_fit=True):
 
         lanenet_start = time.time()
         image_vis = image
@@ -79,6 +76,17 @@ class LaneNetImageProcessor():
             [self.binary_seg_ret, self.instance_seg_ret],
             feed_dict={self.input_tensor: [image]}
         )
+
+
+        if not lane_fit:
+            out_dict = self.postprocessor.postprocess(
+                binary_seg_result=binary_seg_image[0],
+                instance_seg_result=instance_seg_image[0],
+                source_image=image_vis,
+                with_lane_fit=lane_fit
+                data_source='tusimple'
+            )
+            return out_dict
 
         full_lane_pts = self.postprocessor.postprocess_lanepts(
             binary_seg_result=binary_seg_image[0],

@@ -21,11 +21,11 @@ class ImageProcessorNode(Node):
         self.subscriber_ = self.create_subscription(Image, '/raw_frame', self.image_callback, 1)
         self.subscriber_
         self.bridge = CvBridge()
-        self.weights_path = "/home/yvxaiver/lanenet-lane-detection/weights/tusimple_lanenet.ckpt"
+        self.weights_path = "/home/yvxaiver/lanenet-lane-detection/model/tusimple/bisenetv2_lanenet/tusimple_val_miou=0.6789.ckpt-8288"
         self.image_width = 1280
         self.image_height = 720
-        #self.processor = LaneNetImageProcessor(self.weights_path,self.image_width,self.image_height)
-        #self.lanenet_status = self.processor.init_lanenet()
+        self.processor = LaneNetImageProcessor(self.weights_path,self.image_width,self.image_height)
+        self.lanenet_status = self.processor.init_lanenet()
         self.centerpts = []
         self.full_lanepts = []
         
@@ -34,11 +34,15 @@ class ImageProcessorNode(Node):
     def image_callback(self, data):
         try:
             cv_frame = self.bridge.imgmsg_to_cv2(data, "bgr8")
-            #if self.lanenet_status:
+            # if self.lanenet_status:
             #    self.full_lanepts, self.centerpts = self.processor.image_to_trajectory(cv_frame)
+            if self.lanenet_status:
+                self.out_dict = self.processor.image_to_trajectory(cv_frame, lane_fit=False)
+                cv2.imshow('camera', self.out_dict['source_image'])
+                cv2.waitKey(1)
             
-            self.image_save(cv_frame) 
-            self.image_display(cv_frame)
+            # self.image_save(cv_frame) 
+            # self.image_display(cv_frame)
 
         except CvBridgeError as e:
             print(e) # TODO: Error handing
