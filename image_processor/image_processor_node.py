@@ -24,19 +24,21 @@ class ImageProcessorNode(Node):
         self.weights_path = "/home/yvxaiver/lanenet-lane-detection/weights/tusimple_lanenet.ckpt"
         self.image_width = 1280
         self.image_height = 720
-        self.processor = LaneNetImageProcessor(self.weights_path,self.image_width,self.image_height)
-        self.lanenet_status = self.processor.init_lanenet()
+        #self.processor = LaneNetImageProcessor(self.weights_path,self.image_width,self.image_height)
+        #self.lanenet_status = self.processor.init_lanenet()
         self.centerpts = []
         self.full_lanepts = []
+        
+        self.image_serial_n = 0
 
     def image_callback(self, data):
         try:
             cv_frame = self.bridge.imgmsg_to_cv2(data, "bgr8")
-            if self.lanenet_status:
-                self.full_lanepts, self.centerpts = self.processor.image_to_trajectory(cv_frame)
-
+            #if self.lanenet_status:
+            #    self.full_lanepts, self.centerpts = self.processor.image_to_trajectory(cv_frame)
+            
+            self.image_save(cv_frame) 
             self.image_display(cv_frame)
-            self.image_save(cv_frame)
 
         except CvBridgeError as e:
             print(e) # TODO: Error handing
@@ -57,8 +59,9 @@ class ImageProcessorNode(Node):
         cv2.waitKey(1)
     
     def image_save(self, cv_frame):
-        cv2.imwrite('/home/yvxaiver/camera_ws/src/image_processing/output',cv_frame)
-
+        status = cv2.imwrite('/home/yvxaiver/output/1/'+str(self.image_serial_n)+".jpg",cv_frame)
+        self.image_serial_n += 1
+        print(status)
 
 def main(args=None):
     rclpy.init(args=args)
