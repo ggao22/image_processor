@@ -83,9 +83,10 @@ class LaneNetImageProcessor():
                 binary_seg_result=binary_seg_image[0],
                 instance_seg_result=instance_seg_image[0],
                 source_image=image_vis,
-                with_lane_fit=lane_fit
+                with_lane_fit=lane_fit,
                 data_source='tusimple'
             )
+            print('postproc complete')
             return out_dict
 
         full_lane_pts = self.postprocessor.postprocess_lanepts(
