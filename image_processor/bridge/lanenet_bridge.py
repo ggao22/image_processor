@@ -77,7 +77,6 @@ class LaneNetImageProcessor():
             feed_dict={self.input_tensor: [image]}
         )
 
-
         if not lane_fit:
             out_dict = self.postprocessor.postprocess(
                 binary_seg_result=binary_seg_image[0],
@@ -86,7 +85,6 @@ class LaneNetImageProcessor():
                 with_lane_fit=lane_fit,
                 data_source='tusimple'
             )
-            print('postproc complete')
             return out_dict
 
         full_lane_pts = self.postprocessor.postprocess_lanepts(
@@ -119,7 +117,6 @@ class LaneNetImageProcessor():
         
         print('Lane processing cost time: {:.5f}s'.format(time.time() - lanep_start))
         if centerpts: return full_lane_pts, centerpts[closest_lane_idx]
-        # if centerpts: return full_lane_pts, centerpts
         return None, None
 
         
