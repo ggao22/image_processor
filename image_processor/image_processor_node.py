@@ -46,8 +46,8 @@ class ImageProcessorNode(Node):
 
         except CvBridgeError as e:
             print(e) # TODO: Error handing
-        except Exception as e:
-            print(e)
+        #except Exception as e:
+            #print(e)
     
     def image_display(self, cv_frame):
         if self.full_lanepts:
@@ -56,9 +56,10 @@ class ImageProcessorNode(Node):
                         cv2.circle(cv_frame,tuple(([0,self.image_height] - pt)*[-1,1]), 5, (0, 255, 0), -1)
         if self.centerpts:
             print(self.centerpts)
-            for i in range(len(self.centerpts[0])):
-                cv2.circle(cv_frame,(int(self.centerpts[0][i]),
-                                        self.image_height-int(self.centerpts[1][i])), 5, (0, 0, 255), -1)
+            for centerlane in self.centerpts:
+                for i in range(len(centerlane[0])):
+                    cv2.circle(cv_frame,(int(centerlane[0][i]),
+                                        self.image_height-int(centerlane[1][i])), 5, (0, 0, 255), -1)
         cv2.imshow("camera", cv_frame)
         cv2.waitKey(1)
     
