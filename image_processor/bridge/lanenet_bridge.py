@@ -27,10 +27,12 @@ from LaneNetToTrajectory import LaneProcessing, DualLanesToTrajectory
 
 class LaneNetImageProcessor():
 
-    def __init__(self, weights_path, image_width, image_height):
+    def __init__(self, weights_path, image_width, image_height, max_lane_y=420, WARP_RADIUS=20, WP_TO_M_Coeff=[1,1]):
         self.weights_path = weights_path
         self.image_width = image_width
         self.image_height = image_height
+        self.lane_processor = LaneProcessing(self.image_width,self.image_height,max_lane_y,WARP_RADIUS,WP_TO_M_Coeff)
+        self.calibration = True
 
 
     def init_lanenet(self):
@@ -65,11 +67,11 @@ class LaneNetImageProcessor():
         return True
 
 
-    def image_to_trajectory(self, image, lane_fit=True):
+    def image_to_trajectory(self, cv_image, lane_fit=True):
 
         lanenet_start = time.time()
-        image_vis = image
-        image = cv2.resize(image, (512, 256), interpolation=cv2.INTER_LINEAR)
+        image_vis = cv_image
+        image = cv2.resize(cv_image, (512, 256), interpolation=cv2.INTER_LINEAR)
         image = image / 127.5 - 1.0
 
         binary_seg_image, instance_seg_image = self.sess.run(
@@ -96,28 +98,45 @@ class LaneNetImageProcessor():
         print('Lanenet cost time: {:.5f}s'.format(time.time() - lanenet_start))
 
         lanep_start = time.time()
-        full_lane_pts = LaneProcessing(full_lane_pts,image_width=self.image_width,image_height=self.image_height).get_full_lane_pts()
-        centerpts = []
-        splines = []
+        
+        
+        self.lane_processor.process_next_lane(full_lane_pts)
+        full_lane_pts = self.lane_processor.get_full_lane_pts()
+        physical_fullpts = self.lane_processor.get_physical_fullpts()
 
+        if self.calibration:
+            self.processor.auto_warp_radius_calibration(FRAME_BOTTOM_PHYSICAL_WIDTH=1.0)
+            self.processor.y_dist_calibration_tool(cv_image)
+            print(self.processor.WARP_RADIUS)
+            print(self.processor.get_wp_to_m_coeff())
+
+        phy_centerpts = []
+        phy_splines = []
         closest_lane_dist = float('inf')
         closest_lane_idx = 0
+        if full_lane_pts:
+            for i in range(len(physical_fullpts)):
+                if not i: continue
+                traj = DualLanesToTrajectory(physical_fullpts[i-1],physical_fullpts[i],N_centerpts=20)
+                phy_centerpts.append(traj.get_centerpoints())
+                phy_splines.append(traj.get_spline())
+            for i in range(len(phy_splines)):
+                new_dist = abs(phy_splines[i](0)-self.image_width/2)
+                if new_dist < closest_lane_dist:
+                    closest_lane_dist = new_dist
+                    closest_lane_idx = i
+        
+        self.following_path = phy_centerpts[closest_lane_idx]
 
+        # For display output
+        centerpts = []
         if full_lane_pts:
             for i in range(len(full_lane_pts)):
                 if not i: continue
                 traj = DualLanesToTrajectory(full_lane_pts[i-1],full_lane_pts[i],N_centerpts=20)
                 centerpts.append(traj.get_centerpoints())
-                splines.append(traj.get_spline())
-            for i in range(len(splines)):
-                new_dist = abs(splines[i](0)-self.image_width/2)
-                if new_dist < closest_lane_dist:
-                    closest_lane_dist = new_dist
-                    closest_lane_idx = i
         
         print('Lane processing cost time: {:.5f}s'.format(time.time() - lanep_start))
-        if centerpts: return full_lane_pts, centerpts[closest_lane_idx]
+        if centerpts: return full_lane_pts, centerpts
         return None, None
 
-        
-        

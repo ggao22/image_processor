@@ -30,20 +30,19 @@ class ImageProcessorNode(Node):
         self.full_lanepts = []
         
         self.image_serial_n = 0
+        
 
     def image_callback(self, data):
         try:
             cv_frame = self.bridge.imgmsg_to_cv2(data, "bgr8")
+            
             if self.lanenet_status:
                self.full_lanepts, self.centerpts = self.processor.image_to_trajectory(cv_frame)
-
-            # if self.lanenet_status:
-            #     self.out_dict = self.processor.image_to_trajectory(cv_frame, lane_fit=False)
-            #     cv2.imshow('camera', self.out_dict['source_image'])
-            #     cv2.waitKey(1)
             
             # self.image_save(cv_frame) 
             self.image_display(cv_frame)
+
+
 
         except CvBridgeError as e:
             print(e) # TODO: Error handing
