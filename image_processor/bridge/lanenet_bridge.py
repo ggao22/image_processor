@@ -35,7 +35,7 @@ class LaneNetImageProcessor():
         self.image_width = image_width
         self.image_height = image_height
         self.lane_processor = LaneProcessing(self.image_width,self.image_height,max_lane_y,WARP_RADIUS,WP_TO_M_Coeff)
-        self.calibration = True
+        self.calibration = False
         self.following_path = []
 
 
@@ -148,17 +148,18 @@ class LaneNetImageProcessor():
 
 
     def get_point_vector_path(self):
+        print(self.following_path)
         if self.following_path:
             vector = []
             for i in range(len(self.following_path[0])):
                 pt = Point()
                 pt.x = self.following_path[0][i]
                 pt.y = self.following_path[1][i]
-                pt.z = 0
+                pt.z = 0.0
                 vector.append(pt)
             ptv = PointsVector()
             ptv.points = vector
-            ptv.x_coeff = self.lane_processor.get_wp_to_m_coeff()[0]
+            ptv.x_coeff = float(self.lane_processor.get_wp_to_m_coeff()[0])
             return ptv
         return None
 

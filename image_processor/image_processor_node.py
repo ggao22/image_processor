@@ -24,8 +24,9 @@ class ImageProcessorNode(Node):
         self.weights_path = "/home/yvxaiver/lanenet-lane-detection/model/tusimple/bisenetv2_lanenet/tusimple_val_miou=0.6789.ckpt-8288"
         self.image_width = 1280
         self.image_height = 720
-        self.processor = LaneNetImageProcessor(self.weights_path,self.image_width,self.image_height)
-        self.lanenet_status = self.processor.init_lanenet()
+        #self.processor = LaneNetImageProcessor(self.weights_path,self.image_width,self.image_height,520,224.15893476823362,[0.0009591408891298337, 0.0014238519156715736])
+        #self.lanenet_status = self.processor.init_lanenet()
+        self.lanenet_status = False
         self.centerpts = []
         self.full_lanepts = []
         
@@ -41,7 +42,7 @@ class ImageProcessorNode(Node):
                 msg = self.processor.get_point_vector_path()
                 if msg: self.publisher_.publish(msg)
 
-            # self.image_save(cv_frame) 
+            self.image_save(cv_frame) 
             self.image_display(cv_frame)
 
         except Exception as e:
@@ -62,7 +63,7 @@ class ImageProcessorNode(Node):
         cv2.waitKey(1)
     
     def image_save(self, cv_frame):
-        status = cv2.imwrite('/home/yvxaiver/output/1/'+str(self.image_serial_n)+".jpg",cv_frame)
+        status = cv2.imwrite('/home/yvxaiver/output/0/'+str(self.image_serial_n)+".png",cv_frame)
         self.image_serial_n += 1
         print(status)
 
