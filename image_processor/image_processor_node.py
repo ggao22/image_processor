@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 import rclpy
 from rclpy.node import Node
-from rclpy.duration import Duration
-
 from sensor_msgs.msg import Image
-from ackermann_msgs.msg import AckermannDriveStamped
+from points_vector.msg import PointsVector
 
 import sklearn 
 import cv2
@@ -16,10 +14,12 @@ from .bridge.lanenet_bridge import LaneNetImageProcessor
 
 class ImageProcessorNode(Node):
 
+    '''Handles feeding camera frame into lanenet, converting outputs into path to be followed, and publishes that path.'''
+
     def __init__(self):
         super().__init__('image_processor')
         self.subscriber_ = self.create_subscription(Image, '/raw_frame', self.image_callback, 1)
-        self.subscriber_
+        self.publisher_ = self.create_publisher(PointsVector, '/lanenet_path', 1)
         self.bridge = CvBridge()
         self.weights_path = "/home/yvxaiver/lanenet-lane-detection/model/tusimple/bisenetv2_lanenet/tusimple_val_miou=0.6789.ckpt-8288"
         self.image_width = 1280
@@ -37,17 +37,15 @@ class ImageProcessorNode(Node):
             cv_frame = self.bridge.imgmsg_to_cv2(data, "bgr8")
             
             if self.lanenet_status:
-               self.full_lanepts, self.centerpts = self.processor.image_to_trajectory(cv_frame)
-            
+                self.full_lanepts, self.centerpts = self.processor.image_to_trajectory(cv_frame)
+                msg = self.processor.get_point_vector_path()
+                if msg: self.publisher_.publish(msg)
+
             # self.image_save(cv_frame) 
             self.image_display(cv_frame)
 
-
-
-        except CvBridgeError as e:
-            print(e) # TODO: Error handing
-        #except Exception as e:
-            #print(e)
+        except Exception as e:
+            print(e)
     
     def image_display(self, cv_frame):
         if self.full_lanepts:

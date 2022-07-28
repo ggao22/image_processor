@@ -7,6 +7,9 @@ import os.path as ops
 import sys
 import time
 
+from points_vector.msg import PointsVector
+from geometry_msgs.msg import Point
+
 import sklearn 
 import cv2
 import numpy as np
@@ -142,4 +145,20 @@ class LaneNetImageProcessor():
         print('Lane processing cost time: {:.5f}s'.format(time.time() - lanep_start))
         if centerpts: return full_lane_pts, centerpts
         return None, None
+
+
+    def get_point_vector_path(self):
+        if self.following_path:
+            vector = []
+            for i in range(len(self.following_path[0])):
+                pt = Point()
+                pt.x = self.following_path[0][i]
+                pt.y = self.following_path[1][i]
+                pt.z = 0
+                vector.append(pt)
+            ptv = PointsVector()
+            ptv.points = vector
+            ptv.x_coeff = self.lane_processor.get_wp_to_m_coeff()[0]
+            return ptv
+        return None
 
