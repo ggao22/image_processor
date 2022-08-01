@@ -143,8 +143,8 @@ class LaneNetImageProcessor():
                 centerpts.append(traj.get_centerpoints())
         
         print('Lane processing cost time: {:.5f}s'.format(time.time() - lanep_start))
-        if centerpts: return full_lane_pts, centerpts
-        return None, None
+        if centerpts: return full_lane_pts, centerpts, self.following_path
+        return None, None, None
 
 
     def get_point_vector_path(self):

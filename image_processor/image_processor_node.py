@@ -24,11 +24,12 @@ class ImageProcessorNode(Node):
         self.weights_path = "/home/yvxaiver/lanenet-lane-detection/model/tusimple/bisenetv2_lanenet/tusimple_val_miou=0.6789.ckpt-8288"
         self.image_width = 1280
         self.image_height = 720
-        #self.processor = LaneNetImageProcessor(self.weights_path,self.image_width,self.image_height,520,224.15893476823362,[0.0009591408891298337, 0.0014238519156715736])
-        #self.lanenet_status = self.processor.init_lanenet()
+        self.processor = LaneNetImageProcessor(self.weights_path,self.image_width,self.image_height,520,224.15893476823362,[0.0009591408891298337, 0.0014238519156715736])
+        self.lanenet_status = self.processor.init_lanenet()
         self.lanenet_status = False
         self.centerpts = []
         self.full_lanepts = []
+        self.following_path = []
         
         self.image_serial_n = 0
         
@@ -38,11 +39,11 @@ class ImageProcessorNode(Node):
             cv_frame = self.bridge.imgmsg_to_cv2(data, "bgr8")
             
             if self.lanenet_status:
-                self.full_lanepts, self.centerpts = self.processor.image_to_trajectory(cv_frame)
+                self.full_lanepts, self.centerpts, self.following_path = self.processor.image_to_trajectory(cv_frame)
                 msg = self.processor.get_point_vector_path()
                 if msg: self.publisher_.publish(msg)
 
-            self.image_save(cv_frame) 
+            # self.image_save(cv_frame) 
             self.image_display(cv_frame)
 
         except Exception as e:
@@ -59,8 +60,15 @@ class ImageProcessorNode(Node):
                 for i in range(len(centerlane[0])):
                     cv2.circle(cv_frame,(int(centerlane[0][i]),
                                         self.image_height-int(centerlane[1][i])), 5, (0, 0, 255), -1)
+        if self.following_path:
+            plt.clf()
+            plt.plot(self.following_path[0], self.following_path[1], ".r", label="path")
+            plt.grid(True)
+            plt.show()
+        
         cv2.imshow("camera", cv_frame)
         cv2.waitKey(1)
+
     
     def image_save(self, cv_frame):
         status = cv2.imwrite('/home/yvxaiver/output/0/'+str(self.image_serial_n)+".png",cv_frame)
