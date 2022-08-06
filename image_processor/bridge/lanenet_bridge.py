@@ -36,6 +36,7 @@ class LaneNetImageProcessor():
         self.image_height = image_height
         self.lane_processor = LaneProcessing(self.image_width,self.image_height,max_lane_y,WARP_RADIUS,WP_TO_M_Coeff)
         self.calibration = False
+        self.WP_TO_M_Coeff = WP_TO_M_Coeff
         self.following_path = []
 
 
@@ -106,11 +107,10 @@ class LaneNetImageProcessor():
         
         self.lane_processor.process_next_lane(full_lane_pts)
         full_lane_pts = self.lane_processor.get_full_lane_pts()
+        print(full_lane_pts)
         physical_fullpts = self.lane_processor.get_physical_fullpts()
 
         if self.calibration:
-            self.lane_processor.auto_warp_radius_calibration(FRAME_BOTTOM_PHYSICAL_WIDTH=0.43)
-            self.lane_processor.y_dist_calibration_tool(cv_image)
             print(self.lane_processor.WARP_RADIUS)
             print(self.lane_processor.get_wp_to_m_coeff())
             self.calibration = False
@@ -127,8 +127,12 @@ class LaneNetImageProcessor():
                 traj = DualLanesToTrajectory(physical_fullpts[i-1],physical_fullpts[i],N_centerpts=20)
                 phy_centerpts.append(traj.get_centerpoints())
                 phy_splines.append(traj.get_spline())
+            print(phy_centerpts)
+            min_center_y_val = float('inf')
+            #for lane in phy_centerpts:
+                #if min(lane[1]) < min_center_y_val: min_center_y_val = min(lane[1])
             for i in range(len(phy_splines)):
-                new_dist = abs(phy_splines[i](0)-self.image_width/2)
+                new_dist = abs(phy_splines[i](0.2)-(self.image_width*self.WP_TO_M_Coeff[0])/2)
                 if new_dist < closest_lane_dist:
                     closest_lane_dist = new_dist
                     closest_lane_idx = i
