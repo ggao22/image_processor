@@ -96,7 +96,7 @@ class LaneNetImageProcessor():
             out_dict = self.postprocessor.postprocess(
                 binary_seg_result=binary_seg_image[0],
                 instance_seg_result=instance_seg_image[0],
-                source_image=image_vis,
+                source_image=image_vis, 
                 with_lane_fit=lane_fit,
                 data_source='tusimple'
             )
@@ -112,7 +112,6 @@ class LaneNetImageProcessor():
         
         self.lane_processor.process_next_lane(full_lane_pts)
         full_lane_pts = self.lane_processor.get_full_lane_pts()
-        print(full_lane_pts)
         physical_fullpts = self.lane_processor.get_physical_fullpts()
 
         if self.calibration:
@@ -132,7 +131,6 @@ class LaneNetImageProcessor():
                 traj = DualLanesToTrajectory(physical_fullpts[i-1],physical_fullpts[i],N_centerpts=20)
                 phy_centerpts.append(traj.get_centerpoints())
                 phy_splines.append(traj.get_spline())
-            print(phy_centerpts)
             min_center_y_val = float('inf')
             #for lane in phy_centerpts:
                 #if min(lane[1]) < min_center_y_val: min_center_y_val = min(lane[1])
