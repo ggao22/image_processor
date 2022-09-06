@@ -24,7 +24,7 @@ class ImageProcessorNode(Node):
         self.weights_path = "/home/yvxaiver/lanenet-lane-detection/model/tusimple/bisenetv2_lanenet/tusimple_val_miou=0.6789.ckpt-8288"
         self.image_width = 1280
         self.image_height = 720
-        self.processor = LaneNetImageProcessor(self.weights_path,self.image_width,self.image_height,520,224.15893476823362,[0.0009591408891298337, 0.0014238519156715736])
+        self.processor = LaneNetImageProcessor(self.weights_path,self.image_width,self.image_height,520,48.1931707176004,[0.005187456983582503, 0.0046280422281588405])
         self.lanenet_status = self.processor.init_lanenet()
         self.lanenet_status = False
         self.centerpts = []

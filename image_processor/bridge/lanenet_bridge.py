@@ -36,6 +36,7 @@ class LaneNetImageProcessor():
         self.image_height = image_height
         self.lane_processor = LaneProcessing(self.image_width,self.image_height,max_lane_y,WARP_RADIUS,WP_TO_M_Coeff)
         self.calibration = False
+        self.full_lane_pts = []
         self.following_path = []
 
 
@@ -73,15 +74,22 @@ class LaneNetImageProcessor():
 
     def image_to_trajectory(self, cv_image, lane_fit=True):
 
-        lanenet_start = time.time()
+        T_start = time.time()
+
         image_vis = cv_image
         image = cv2.resize(cv_image, (512, 256), interpolation=cv2.INTER_LINEAR)
         image = image / 127.5 - 1.0
+
+        T_resize = time.time()
+        LOG.info('Image Resize cost time: {:.5f}s'.format(T_resize-T_start))
 
         binary_seg_image, instance_seg_image = self.sess.run(
             [self.binary_seg_ret, self.instance_seg_ret],
             feed_dict={self.input_tensor: [image]}
         )
+
+        T_seg_inference = time.time()
+        LOG.info('TOTAL Segmentation Inference cost time: {:.5f}s'.format(T_seg_inference-T_resize))
 
         if not lane_fit:
             out_dict = self.postprocessor.postprocess(
@@ -99,10 +107,7 @@ class LaneNetImageProcessor():
             source_image=image_vis,
             data_source='tusimple'
         )
-        print('Lanenet cost time: {:.5f}s'.format(time.time() - lanenet_start))
-
-        lanep_start = time.time()
-        
+        self.full_lane_pts = full_lane_pts
         
         self.lane_processor.process_next_lane(full_lane_pts)
         full_lane_pts = self.lane_processor.get_full_lane_pts()
@@ -121,7 +126,7 @@ class LaneNetImageProcessor():
         closest_lane_dist = float('inf')
         closest_lane_idx = 0
         if physical_fullpts:
-            print(physical_fullpts)
+            #print(physical_fullpts)
             for i in range(len(physical_fullpts)):
                 if not i: continue
                 traj = DualLanesToTrajectory(physical_fullpts[i-1],physical_fullpts[i],N_centerpts=20)
@@ -142,14 +147,16 @@ class LaneNetImageProcessor():
                 traj = DualLanesToTrajectory(full_lane_pts[i-1],full_lane_pts[i],N_centerpts=20)
                 centerpts.append(traj.get_centerpoints())
         
-        print('Lane processing cost time: {:.5f}s'.format(time.time() - lanep_start))
+        T_post_process = time.time()
+        LOG.info('Image Post-Process cost time: {:.5f}s'.format(T_post_process-T_seg_inference))
+
         if centerpts: return full_lane_pts, centerpts, self.following_path
         return None, None, None
 
 
     def get_point_vector_path(self):
-        print(self.following_path)
-        if self.following_path:
+        #print(self.following_path)
+        if self.following_path and self.full_lane_pts:
             vector = []
             for i in range(len(self.following_path[0])):
                 pt = Point()
