@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import rclpy
 from rclpy.node import Node
+from rclpy.executors import MultiThreadedExecutor
 from sensor_msgs.msg import Image
 from points_vector.msg import PointsVector
 
@@ -78,9 +79,19 @@ class ImageProcessorNode(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    image_processor = ImageProcessorNode()
+    image_processor_0 = ImageProcessorNode('Node_0')
+    image_processor_1 = ImageProcessorNode('Node_1')
+    image_processor_2 = ImageProcessorNode('Node_2')
+    image_processor_3 = ImageProcessorNode('Node_3')
 
-    rclpy.spin(image_processor)
+
+    executor = MultiThreadedExecutor()
+    executor.add_node(image_processor_0)
+    executor.add_node(image_processor_1)
+    executor.add_node(image_processor_2)
+    executor.add_node(image_processor_3)
+
+    executor.spin()
     rclpy.shutdown()
 
 
