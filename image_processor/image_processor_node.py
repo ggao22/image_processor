@@ -79,19 +79,9 @@ class ImageProcessorNode(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    image_processor_0 = ImageProcessorNode('Node_0')
-    image_processor_1 = ImageProcessorNode('Node_1')
-    image_processor_2 = ImageProcessorNode('Node_2')
-    image_processor_3 = ImageProcessorNode('Node_3')
+    image_processor = ImageProcessorNode()
 
-
-    executor = MultiThreadedExecutor()
-    executor.add_node(image_processor_0)
-    executor.add_node(image_processor_1)
-    executor.add_node(image_processor_2)
-    executor.add_node(image_processor_3)
-
-    executor.spin()
+    rclpy.spin(image_processor)
     rclpy.shutdown()
 
 
