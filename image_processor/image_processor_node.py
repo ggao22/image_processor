@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import rclpy
 from rclpy.node import Node
-from rclpy.executors import MultiThreadedExecutor
 from sensor_msgs.msg import Image
 from points_vector.msg import PointsVector
 
