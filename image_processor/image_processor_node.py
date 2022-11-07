@@ -3,6 +3,7 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
 from points_vector.msg import PointsVector
+from lanenet_out.msg import OrderedSegmentation
 
 import sklearn 
 import cv2
@@ -18,8 +19,19 @@ class ImageProcessorNode(Node):
 
     def __init__(self):
         super().__init__('image_processor')
-        self.subscriber_ = self.create_subscription(Image, '/raw_frame', self.image_callback, 1)
-        self.publisher_ = self.create_publisher(PointsVector, '/lanenet_path', 1)
+
+        # Mode should be given upon node run
+        self.declare_parameter('mode')
+
+        if self.get_parameter('mode') == "vanilla":
+            self.subscriber_ = self.create_subscription(Image, '/raw_frame', self.vanilla_image_callback, 1)
+            self.publisher_ = self.create_publisher(PointsVector, '/lanenet_path', 1)
+        elif self.get_parameter('mode') == "cluster_parall":
+            self.subscriber_ = self.create_subscription(Image, '/raw_frame', self.cluster_parall_image_callback, 1)
+            self.publisher_ = self.create_publisher(OrderedSegmentation, '/lanenet_out', 1)
+        else:
+            raise ValueError('Mode not provided or does not exist.')
+
         self.bridge = CvBridge()
         self.weights_path = "/home/yvxaiver/lanenet-lane-detection/modelv2/tusimple/bisenetv2_lanenet/tusimple_val_miou=0.6843.ckpt-1328"
         self.image_width = 1280
@@ -30,11 +42,10 @@ class ImageProcessorNode(Node):
         self.centerpts = []
         self.full_lanepts = []
         self.following_path = []
-        
         self.image_serial_n = 0
         
 
-    def image_callback(self, data):
+    def vanilla_image_callback(self, data):
         try:
             cv_frame = self.bridge.imgmsg_to_cv2(data, "bgr8")
             
@@ -48,7 +59,21 @@ class ImageProcessorNode(Node):
 
         except Exception as e:
             print(e)
+
+
+    def cluster_parall_image_callback(self, data):
+        try:
+            cv_frame = self.bridge.imgmsg_to_cv2(data, "bgr8")
+            
+            if self.lanenet_status:
+                binary_seg_image, instance_seg_image, out_index = self.processor.image_to_segmentation(cv_frame)
+                msg = self.processor.get_ordered_segmentation_msg(cv_frame, binary_seg_image, instance_seg_image, out_index)
+                self.publisher_.publish(msg)
+
+        except Exception as e:
+            print(e)
     
+
     def image_display(self, cv_frame):
         if self.full_lanepts:
                 for lane in self.full_lanepts:

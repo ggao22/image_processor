@@ -9,6 +9,9 @@ import time
 
 from points_vector.msg import PointsVector
 from geometry_msgs.msg import Point
+from sensor_msgs.msg import Image
+from lanenet_out.msg import OrderedSegmentation
+import ros2_numpy as rnp
 
 import sklearn 
 import cv2
@@ -39,6 +42,8 @@ class LaneNetImageProcessor():
         self.full_lane_pts = []
         self.WP_TO_M_Coeff = WP_TO_M_Coeff
         self.following_path = []
+
+        self.out_index = -1
 
 
     def init_lanenet(self):
@@ -125,15 +130,11 @@ class LaneNetImageProcessor():
         closest_lane_dist = float('inf')
         closest_lane_idx = 0
         if physical_fullpts:
-            #print(physical_fullpts)
             for i in range(len(physical_fullpts)):
                 if not i: continue
                 traj = DualLanesToTrajectory(physical_fullpts[i-1],physical_fullpts[i],N_centerpts=20)
                 phy_centerpts.append(traj.get_centerpoints())
                 phy_splines.append(traj.get_spline())
-            min_center_y_val = float('inf')
-            #for lane in phy_centerpts:
-                #if min(lane[1]) < min_center_y_val: min_center_y_val = min(lane[1])
             for i in range(len(phy_splines)):
                 new_dist = abs(phy_splines[i](0.2)-(self.image_width*self.WP_TO_M_Coeff[0])/2)
                 if new_dist < closest_lane_dist:
@@ -155,9 +156,31 @@ class LaneNetImageProcessor():
         if centerpts: return full_lane_pts, centerpts, self.following_path
         return None, None, None
 
+    
+    def image_to_segmentation(self, cv_image):
+
+        T_start = time.time()
+
+        image = cv2.resize(cv_image, (512, 256), interpolation=cv2.INTER_LINEAR)
+        image = image / 127.5 - 1.0
+
+        T_resize = time.time()
+        LOG.info('Image Resize cost time: {:.5f}s'.format(T_resize-T_start))
+
+        binary_seg_image, instance_seg_image = self.sess.run(
+            [self.binary_seg_ret, self.instance_seg_ret],
+            feed_dict={self.input_tensor: [image]}
+        )
+
+        T_seg_inference = time.time()
+        LOG.info('TOTAL Segmentation Inference cost time: {:.5f}s'.format(T_seg_inference-T_resize))
+
+        self.out_index += 1
+
+        return binary_seg_image[0], instance_seg_image[0], self.out_index
+
 
     def get_point_vector_path(self):
-        #print(self.following_path)
         if self.following_path and self.full_lane_pts:
             vector = []
             for i in range(len(self.following_path[0])):
@@ -171,4 +194,13 @@ class LaneNetImageProcessor():
             ptv.x_coeff = float(self.lane_processor.get_wp_to_m_coeff()[0])
             return ptv
         return None
+
+    
+    def get_ordered_segmentation_msg(self, source_img, binary_seg, instance_seg, out_index):
+        msg = OrderedSegmentation()
+        msg.source_img = rnp.msgify(Image, source_img)
+        msg.binary_seg = rnp.msgify(Image, binary_seg)
+        msg.instance_seg = rnp.msgify(Image, instance_seg)
+        msg.order = out_index
+        return msg
 

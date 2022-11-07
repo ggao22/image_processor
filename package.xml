@@ -13,6 +13,8 @@
   <depend>ackermann_msgs</depend>
   <depend>geometry_msgs</depend>
   <depend>points_vector</depend>
+  <depend>lanenet_out</depend>
+  <depend>ros2_numpy</depend>
 
   <export>
     <build_type>ament_python</build_type>
