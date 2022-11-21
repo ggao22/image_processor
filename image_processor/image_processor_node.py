@@ -27,6 +27,7 @@ class ImageProcessorNode(Node):
             self.subscriber_ = self.create_subscription(Image, '/raw_frame', self.vanilla_image_callback, 1)
             self.publisher_ = self.create_publisher(PointsVector, '/lanenet_path', 1)
         elif str(self.get_parameter('mode').value) == "cluster_parall":
+            print("Running parallel clustering...")
             self.subscriber_ = self.create_subscription(Image, '/raw_frame', self.cluster_parall_image_callback, 1)
             self.publisher_ = self.create_publisher(OrderedSegmentation, '/lanenet_out', 1)
         else:
@@ -67,6 +68,9 @@ class ImageProcessorNode(Node):
             
             if self.lanenet_status:
                 binary_seg_image, instance_seg_image, out_index = self.processor.image_to_segmentation(cv_frame)
+                print(binary_seg_image.shape)
+                print(instance_seg_image.shape)
+                print(cv_frame.shape)
                 msg = self.processor.get_ordered_segmentation_msg(cv_frame, binary_seg_image, instance_seg_image, out_index)
                 self.publisher_.publish(msg)
 
