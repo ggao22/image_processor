@@ -198,9 +198,9 @@ class LaneNetImageProcessor():
     
     def get_ordered_segmentation_msg(self, source_img, binary_seg, instance_seg, out_index):
         msg = OrderedSegmentation()
-        msg.source_img = rnp.msgify(Image, source_img)
-        msg.binary_seg = rnp.msgify(Image, binary_seg)
-        msg.instance_seg = rnp.msgify(Image, instance_seg)
+        msg.source_img = rnp.msgify(Image, source_img, encoding='rgb8')
+        msg.binary_seg = rnp.msgify(Image, binary_seg, encoding='mono8')
+        msg.instance_seg = rnp.msgify(Image, instance_seg, encoding='rgba8')
         msg.order = out_index
         return msg
 
