@@ -23,10 +23,10 @@ class ImageProcessorNode(Node):
         # Mode should be given upon node run
         self.declare_parameter('mode')
 
-        if self.get_parameter('mode') == "vanilla":
+        if str(self.get_parameter('mode').value) == "vanilla":
             self.subscriber_ = self.create_subscription(Image, '/raw_frame', self.vanilla_image_callback, 1)
             self.publisher_ = self.create_publisher(PointsVector, '/lanenet_path', 1)
-        elif self.get_parameter('mode') == "cluster_parall":
+        elif str(self.get_parameter('mode').value) == "cluster_parall":
             self.subscriber_ = self.create_subscription(Image, '/raw_frame', self.cluster_parall_image_callback, 1)
             self.publisher_ = self.create_publisher(OrderedSegmentation, '/lanenet_out', 1)
         else:
