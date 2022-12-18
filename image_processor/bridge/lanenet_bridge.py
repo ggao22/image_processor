@@ -48,7 +48,7 @@ class LaneNetImageProcessor():
 
     def init_lanenet(self):
 
-        self.input_tensor = tf.placeholder(dtype=tf.float32, shape=[1, 256, 512, 3], name='input_tensor')
+        self.input_tensor = tf.placeholder(dtype=tf.float32, shape=[1, self.image_height, self.image_width, 3], name='input_tensor')
 
         self.net = lanenet.LaneNet(phase='test', cfg=CFG)
         self.binary_seg_ret, self.instance_seg_ret = self.net.inference(input_tensor=self.input_tensor, name='LaneNet')
@@ -83,7 +83,7 @@ class LaneNetImageProcessor():
         T_start = time.time()
 
         image_vis = cv_image
-        image = cv2.resize(cv_image, (512, 256), interpolation=cv2.INTER_LINEAR)
+        image = cv2.resize(cv_image, (self.image_width, self.image_height), interpolation=cv2.INTER_LINEAR)
         image = image / 127.5 - 1.0
 
         T_resize = time.time()
@@ -198,9 +198,9 @@ class LaneNetImageProcessor():
     
     def get_ordered_segmentation_msg(self, source_img, binary_seg, instance_seg, out_index):
         msg = OrderedSegmentation()
-        msg.source_img = rnp.msgify(Image, source_img, encoding='rgb8')
-        msg.binary_seg = rnp.msgify(Image, binary_seg, encoding='mono8')
-        msg.instance_seg = rnp.msgify(Image, instance_seg, encoding='rgba8')
+        msg.source_img = rnp.msgify(Image, source_img.astype('int8'), encoding='8SC3')
+        msg.binary_seg = rnp.msgify(Image, binary_seg.astype('int8'), encoding='8SC1')
+        msg.instance_seg = rnp.msgify(Image, instance_seg.astype('int8'), encoding='8SC4')
         msg.order = out_index
         return msg
 
