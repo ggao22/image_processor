@@ -78,7 +78,7 @@ class LaneNetImageProcessor():
         return True
 
 
-    def image_to_trajectory(self, cv_image, lane_fit=True):
+    def image_to_trajectory(self, cv_image, serial_n, lane_fit=True):
 
         T_start = time.time()
 
@@ -111,7 +111,8 @@ class LaneNetImageProcessor():
             binary_seg_result=binary_seg_image[0],
             instance_seg_result=instance_seg_image[0],
             source_image=image_vis,
-            data_source='tusimple'
+            data_source='tusimple',
+            serial_n=serial_n
         )
         self.full_lane_pts = full_lane_pts
         

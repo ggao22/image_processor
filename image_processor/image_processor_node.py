@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import rclpy
 from rclpy.node import Node
+from rclpy.callback_groups import ReentrantCallbackGroup
+from rclpy.executors import MultiThreadedExecutor
 from sensor_msgs.msg import Image
 from points_vector.msg import PointsVector
 from lanenet_out.msg import OrderedSegmentation
@@ -24,7 +26,8 @@ class ImageProcessorNode(Node):
         self.declare_parameter('mode')
 
         if str(self.get_parameter('mode').value) == "vanilla":
-            self.subscriber_ = self.create_subscription(Image, '/raw_frame', self.vanilla_image_callback, 1)
+            cb_group = ReentrantCallbackGroup()
+            self.subscriber_ = self.create_subscription(Image, '/raw_frame', self.vanilla_image_callback, 1, callback_group=cb_group)
             self.publisher_ = self.create_publisher(PointsVector, '/lanenet_path', 1)
         elif str(self.get_parameter('mode').value) == "cluster_parall":
             print("Running parallel clustering...")
@@ -44,6 +47,7 @@ class ImageProcessorNode(Node):
         self.full_lanepts = []
         self.following_path = []
         self.image_serial_n = 0
+
         
 
     def vanilla_image_callback(self, data):
@@ -51,10 +55,11 @@ class ImageProcessorNode(Node):
             cv_frame = self.bridge.imgmsg_to_cv2(data, "bgr8")
             
             if self.lanenet_status:
-                self.full_lanepts, self.centerpts, self.following_path = self.processor.image_to_trajectory(cv_frame)
+                self.full_lanepts, self.centerpts, self.following_path = self.processor.image_to_trajectory(cv_frame, self.image_serial_n)
                 msg = self.processor.get_point_vector_path()
                 print(self.full_lanepts)
                 if msg: self.publisher_.publish(msg)
+                self.image_serial_n += 1
 
             #self.image_save(cv_frame) 
             self.image_display(cv_frame)
@@ -109,9 +114,13 @@ def main(args=None):
     rclpy.init(args=args)
 
     image_processor = ImageProcessorNode()
-
-    rclpy.spin(image_processor)
+    executor = MultiThreadedExecutor()
+    executor.add_node(image_processor)
+    executor.spin()
+    
+    image_processor.destroy_node()
     rclpy.shutdown()
+
 
 
 if __name__ == '__main__':
