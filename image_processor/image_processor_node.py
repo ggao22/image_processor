@@ -36,7 +36,7 @@ class ImageProcessorNode(Node):
             raise ValueError('Mode not provided or does not exist.')
 
         self.bridge = CvBridge()
-        self.weights_path = "/home/yvxaiver/lanenet-lane-detection/modelv3/tusimple/bisenetv2_lanenet/tusimple_val_miou=0.5660.ckpt-312"
+        self.weights_path = "/home/yvxaiver/lanenet-lane-detection/modelv2/tusimple/bisenetv2_lanenet/tusimple_val_miou=0.6843.ckpt-1328"
         self.image_width = 1280
         self.image_height = 720
         self.processor = LaneNetImageProcessor(self.weights_path,self.image_width,self.image_height,520,70.8,[0.005187456983582503, 0.0046280422281588405])
