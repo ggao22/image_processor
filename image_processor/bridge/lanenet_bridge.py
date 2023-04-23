@@ -83,7 +83,7 @@ class LaneNetImageProcessor():
         T_start = time.time()
 
         image_vis = cv_image
-        image = cv2.resize(cv_image, (256, 512), interpolation=cv2.INTER_LINEAR)
+        image = cv2.resize(cv_image, (512, 256), interpolation=cv2.INTER_LINEAR)
         image = image / 127.5 - 1.0
 
         T_resize = time.time()
