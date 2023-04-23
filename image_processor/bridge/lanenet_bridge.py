@@ -48,7 +48,7 @@ class LaneNetImageProcessor():
 
     def init_lanenet(self):
 
-        self.input_tensor = tf.placeholder(dtype=tf.float32, shape=[1, self.image_height, self.image_width, 3], name='input_tensor')
+        self.input_tensor = tf.placeholder(dtype=tf.float32, shape=[1, 256, 512, 3], name='input_tensor')
 
         self.net = lanenet.LaneNet(phase='test', cfg=CFG)
         self.binary_seg_ret, self.instance_seg_ret = self.net.inference(input_tensor=self.input_tensor, name='LaneNet')
@@ -83,7 +83,7 @@ class LaneNetImageProcessor():
         T_start = time.time()
 
         image_vis = cv_image
-        image = cv2.resize(cv_image, (self.image_width, self.image_height), interpolation=cv2.INTER_LINEAR)
+        image = cv2.resize(cv_image, (256, 512), interpolation=cv2.INTER_LINEAR)
         image = image / 127.5 - 1.0
 
         T_resize = time.time()
