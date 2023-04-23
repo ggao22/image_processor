@@ -46,6 +46,7 @@ class ImageProcessorNode(Node):
         self.full_lanepts = []
         self.following_path = []
         self.image_serial_n = 0
+        self.current_k = 0
 
         
 
@@ -54,7 +55,7 @@ class ImageProcessorNode(Node):
             cv_frame = self.bridge.imgmsg_to_cv2(data, "bgr8")
             
             if self.lanenet_status:
-                self.full_lanepts, self.centerpts, self.following_path = self.processor.image_to_trajectory(cv_frame, self.image_serial_n)
+                self.full_lanepts, self.centerpts, self.following_path = self.processor.image_to_trajectory(cv_frame, self.image_serial_n, self.current_k)
                 msg = self.processor.get_point_vector_path()
                 # print(self.full_lanepts)
                 if msg: self.publisher_.publish(msg)
