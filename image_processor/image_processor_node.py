@@ -2,7 +2,6 @@
 import rclpy
 from rclpy.node import Node
 from rclpy.callback_groups import ReentrantCallbackGroup
-from rclpy.executors import MultiThreadedExecutor
 from sensor_msgs.msg import Image
 from points_vector.msg import PointsVector
 from lanenet_out.msg import OrderedSegmentation
@@ -114,10 +113,8 @@ def main(args=None):
     rclpy.init(args=args)
 
     image_processor = ImageProcessorNode()
-    executor = MultiThreadedExecutor()
-    executor.add_node(image_processor)
-    executor.spin()
-    
+    rclpy.spin(image_processor)
+
     image_processor.destroy_node()
     rclpy.shutdown()
 
