@@ -56,7 +56,7 @@ class ImageProcessorNode(Node):
             if self.lanenet_status:
                 self.full_lanepts, self.centerpts, self.following_path = self.processor.image_to_trajectory(cv_frame, self.image_serial_n)
                 msg = self.processor.get_point_vector_path()
-                print(self.full_lanepts)
+                # print(self.full_lanepts)
                 if msg: self.publisher_.publish(msg)
                 self.image_serial_n += 1
 

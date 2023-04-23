@@ -132,7 +132,7 @@ class LaneNetImageProcessor():
         closest_lane_idx = 0
         if physical_fullpts:
             for i in range(len(physical_fullpts)):
-                if not i: continue
+                if not i: contiiue
                 traj = DualLanesToTrajectory(physical_fullpts[i-1],physical_fullpts[i],N_centerpts=20)
                 phy_centerpts.append(traj.get_centerpoints())
                 phy_splines.append(traj.get_spline())
