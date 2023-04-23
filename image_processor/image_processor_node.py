@@ -37,8 +37,8 @@ class ImageProcessorNode(Node):
 
         self.bridge = CvBridge()
         self.weights_path = "/home/yvxaiver/lanenet-lane-detection/modelv3/tusimple/bisenetv2_lanenet/tusimple_val_miou=0.5660.ckpt-312"
-        self.image_width = 256
-        self.image_height = 128
+        self.image_width = 1280
+        self.image_height = 720
         self.processor = LaneNetImageProcessor(self.weights_path,self.image_width,self.image_height,520,70.8,[0.005187456983582503, 0.0046280422281588405])
         self.lanenet_status = self.processor.init_lanenet()
         #self.lanenet_status = False
