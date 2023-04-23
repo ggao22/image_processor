@@ -156,7 +156,7 @@ class LaneNetImageProcessor():
         LOG.info('Image Post-Process cost time: {:.5f}s'.format(T_post_process-T_seg_inference))
 
         if centerpts: return full_lane_pts, centerpts, self.following_path, k
-        return None, None, None, current_k
+        return None, None, None, k
 
     
     def image_to_segmentation(self, cv_image):
