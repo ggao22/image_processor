@@ -107,7 +107,7 @@ class LaneNetImageProcessor():
             )
             return out_dict
 
-        full_lane_pts = self.postprocessor.postprocess_lanepts(
+        full_lane_pts, k = self.postprocessor.postprocess_lanepts(
             binary_seg_result=binary_seg_image[0],
             instance_seg_result=instance_seg_image[0],
             source_image=image_vis,
@@ -155,8 +155,8 @@ class LaneNetImageProcessor():
         T_post_process = time.time()
         LOG.info('Image Post-Process cost time: {:.5f}s'.format(T_post_process-T_seg_inference))
 
-        if centerpts: return full_lane_pts, centerpts, self.following_path
-        return None, None, None
+        if centerpts: return full_lane_pts, centerpts, self.following_path, k
+        return None, None, None, current_k
 
     
     def image_to_segmentation(self, cv_image):
